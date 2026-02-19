@@ -1,27 +1,19 @@
 import os
 from datetime import datetime
-from src.jobspy import scrape_jobs
+from jobspy import scrape_jobs
 from s3.s3_helpers import upload_to_s3
 from src.processors.aggregator import aggregate_csv_files
 from dotenv import load_dotenv
 load_dotenv()
 
-# Helper function to convert string to boolean
-def str_to_bool(s):
-    return s.lower() == 'true' if s else False
-
-# Parse SEARCH_TERMS
+SEARCH_TERMS = os.getenv('SEARCH_TERMS', '').split(',')
 SEARCH_TERMS = os.getenv('SEARCH_TERMS', '').split(',')
 
-# Construct SCRAPER_SETTINGS from environment variables
 SCRAPER_SETTINGS = {
     'site_names': os.getenv('SITE_NAMES', '').split(','),
     'location': os.getenv('LOCATION', 'Canada'),
     'results_wanted': int(os.getenv('RESULTS_WANTED', '15')),
     'country_indeed': os.getenv('COUNTRY_INDEED', 'Canada'),
-    'hyperlinks': str_to_bool(os.getenv('HYPERLINKS')),
-    'proxy': os.getenv('PROXY', None),
-    'offset': int(os.getenv('OFFSET', '0'))
 }
 
 def setup_data_directory(base_path: str, sub_path: str) -> str:
@@ -56,10 +48,10 @@ def main():
     site_names = SCRAPER_SETTINGS['site_names']
     location = SCRAPER_SETTINGS['location']
     results_wanted = SCRAPER_SETTINGS['results_wanted']
-    country = SCRAPER_SETTINGS['country_indeed'] # Indeed only 
+    country = SCRAPER_SETTINGS['country_indeed']
         
     for term in search_terms:
-        timestamp = datetime.now().strftime('%Y%m%dT%H%M%S')  # Compact timestamp
+        timestamp = datetime.now().strftime('%Y%m%dT%H%M%S')
         term_filename = term.replace(" ", "_").lower()
         csv_filename = f'jobs_{term_filename}_{timestamp}.csv'
         jobs_csv_path = os.path.join(individual_run_dir, csv_filename)
@@ -68,7 +60,7 @@ def main():
     
     aggregated_file_path = aggregate_csv_files(individual_run_dir, aggregated_dir)
     
-    date_prefix = datetime.now().strftime('%Y/%m/%d')  # S3 prefix in 'YYYY/MM/DD' format
+    date_prefix = datetime.now().strftime('%Y/%m/%d')
     s3_key_aggregated = f"{date_prefix}/aggregated_jobs.csv"
     upload_data_to_s3(os.getenv('S3_BUCKET_NAME'), s3_key_aggregated, aggregated_file_path)
 
