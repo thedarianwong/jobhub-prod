@@ -25,22 +25,19 @@ const JobListings = ({ jobs: propJobs, onBack }: JobListingsProps) => {
   const [dateFilter, setDateFilter] = useState('');
 
   useEffect(() => {
-    // Fetch jobs only if propJobs is not provided
-    if (!propJobs) {
+    if (propJobs) {
+      setJobs(propJobs);
+    } else {
       const fetchJobs = async () => {
         try {
-          const response = await axios.get('https://9loe6yy9pk.execute-api.us-east-1.amazonaws.com/prod/jobs');
-          // Assuming response.data directly returns the array of jobs
+          const response = await axios.get(process.env.NEXT_PUBLIC_API_URL!);
           if (response.status === 200 && Array.isArray(response.data)) {
             setJobs(response.data);
-          } else {
-            console.error("API response data is not an array.");
           }
         } catch (error) {
           console.error('Error fetching jobs:', error);
         }
       };
-
       fetchJobs();
     }
   }, [propJobs]);
@@ -87,9 +84,8 @@ const JobListings = ({ jobs: propJobs, onBack }: JobListingsProps) => {
     const parts = dateString.split('-'); // Split the date string into [year, month, day]
   // Note that months are 0-indexed in JavaScript Date, so subtract 1
     const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-    console.log(dateString)
     const year = date.getFullYear();
-    const month = date.toLocaleString('en-US', { month: 'short' }).toUpperCase(); // 'short' gives abbreviated month
+    const month = date.toLocaleString('en-US', { month: 'short' }).toUpperCase();
     const day = date.getDate();
   
     return `${year} ${month} ${day}`;
