@@ -162,6 +162,7 @@ cython_debug/
 # removable data
 scraper/data/
 database/temp/
+lambdas/dist/
 
 .docker-sync
 .DS_Store
