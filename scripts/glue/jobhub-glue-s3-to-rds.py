@@ -85,6 +85,7 @@ def load_to_postgres(df, db_config):
             dbname=db_config["DB_NAME"],
             user=db_config["DB_USER"],
             password=db_config["DB_PASSWORD"],
+            sslmode="require",
         ) as conn:
             with conn.cursor() as cursor:
                 insert_columns = ', '.join([f'"{col}"' for col in df.columns])
