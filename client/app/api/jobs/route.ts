@@ -8,6 +8,7 @@ const pool = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  max: 5,
 });
 
 export async function GET() {
@@ -18,6 +19,7 @@ export async function GET() {
     );
     return NextResponse.json(result.rows);
   } catch (error) {
+    console.error('Failed to fetch jobs:', error);
     return NextResponse.json({ error: 'Failed to fetch jobs' }, { status: 500 });
   } finally {
     client.release();

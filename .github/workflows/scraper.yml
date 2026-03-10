@@ -24,15 +24,20 @@ jobs:
         run: docker build -t jobhub-scraper ./scraper
 
       - name: Run scraper
+        env:
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          SEARCH_TERMS: ${{ secrets.SEARCH_TERMS }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           docker run --rm \
-            -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
-            -e SEARCH_TERMS="${{ secrets.SEARCH_TERMS }}" \
+            -e S3_BUCKET_NAME="$S3_BUCKET_NAME" \
+            -e SEARCH_TERMS="$SEARCH_TERMS" \
             -e SITE_NAMES="indeed,linkedin" \
             -e LOCATION="Canada" \
             -e RESULTS_WANTED="15" \
             -e COUNTRY_INDEED="Canada" \
-            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
-            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+            -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
             -e AWS_DEFAULT_REGION=us-east-1 \
             jobhub-scraper
