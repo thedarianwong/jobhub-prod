@@ -11,6 +11,7 @@ trap "rm -rf $STAGING" EXIT
 
 echo "Installing psycopg2-binary for Amazon Linux (Lambda runtime)..."
 docker run --rm \
+  --platform linux/amd64 \
   --entrypoint pip \
   -v "$STAGING:/staging" \
   public.ecr.aws/lambda/python:3.11 \
